@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puctinov's Handling Editor</title>
+    <!-- Outfit Font for UI, JetBrains Mono for Code/Numbers -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Clipboard Utility (Hidden) -->
+    <textarea id="clipboard-helper" style="position: absolute; left: -99999px;"></textarea>
+
+    <!-- Tuning Interface -->
+    <div id="editor-container" class="glass-panel" style="display: none;">
+        <!-- Header -->
+        <header class="editor-header">
+            <div class="header-info">
+                <h1>Puctinov's Handling Editor</h1>
+                <span id="vehicle-label">COMET (comet)</span>
+            </div>
+            <button id="close-btn" class="icon-btn">&times;</button>
+        </header>
+
+        <!-- Main Body -->
+        <div class="editor-body">
+            <!-- Sidebar Navigation -->
+            <nav class="category-tabs">
+                <button class="tab-btn active" data-tab="engine">Engine & Drive</button>
+                <button class="tab-btn" data-tab="brakes">Brakes & Steering</button>
+                <button class="tab-btn" data-tab="traction">Traction & Tires</button>
+                <button class="tab-btn" data-tab="suspension">Suspension & Chassis</button>
+                <button class="tab-btn" data-tab="damage">Damage & Misc</button>
+            </nav>
+
+            <!-- Tuning Content Area -->
+            <main class="tab-content">
+                <!-- Tab: Engine & Transmission -->
+                <section id="tab-engine" class="tab-pane active">
+                    <div class="cards-grid" id="grid-engine"></div>
+                </section>
+
+                <!-- Tab: Brakes & Steering -->
+                <section id="tab-brakes" class="tab-pane">
+                    <div class="cards-grid" id="grid-brakes"></div>
+                </section>
+
+                <!-- Tab: Traction & Tires -->
+                <section id="tab-traction" class="tab-pane">
+                    <div class="cards-grid" id="grid-traction"></div>
+                </section>
+
+                <!-- Tab: Suspension & Chassis -->
+                <section id="tab-suspension" class="tab-pane">
+                    <div class="cards-grid" id="grid-suspension"></div>
+                </section>
+
+                <!-- Tab: Damage & Misc -->
+                <section id="tab-damage" class="tab-pane">
+                    <div class="cards-grid" id="grid-damage"></div>
+                </section>
+            </main>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="editor-footer">
+            <div class="footer-left">
+                <button id="reset-btn" class="btn btn-secondary">Reset to Stock</button>
+            </div>
+            <div class="footer-right">
+                <button id="import-btn" class="btn btn-purple">Import XML</button>
+                <button id="copy-btn" class="btn btn-info">Copy XML/Lua</button>
+                <button id="save-btn" class="btn btn-primary">Save to Database</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Import XML Modal -->
+    <div id="import-modal" class="modal-overlay">
+        <div class="modal-container">
+            <header class="modal-header">
+                <h2>Import Handling XML</h2>
+                <button id="import-modal-close" class="icon-btn">&times;</button>
+            </header>
+            <div class="modal-body">
+                <p>Paste the vehicle handling XML snippet below (e.g. from CHandlingData or CCarHandlingData tags). The values will be parsed and applied live to your vehicle.</p>
+                <textarea id="import-xml-textarea" class="modal-textarea" placeholder="<fMass value=&quot;1500.0000&quot; />&#10;<fInitialDragCoeff value=&quot;10.0000&quot; />&#10;..."></textarea>
+                <div id="import-error-msg" style="color: var(--color-secondary); font-size: 0.85rem; display: none;">Invalid XML format. Make sure to paste valid tags.</div>
+            </div>
+            <footer class="modal-footer">
+                <button id="import-cancel-btn" class="btn btn-secondary">Cancel</button>
+                <button id="import-submit-btn" class="btn btn-primary">Parse & Apply</button>
+            </footer>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
