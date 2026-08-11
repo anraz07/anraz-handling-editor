@@ -5,4 +5,5 @@
 /server
 /config.lua
 /fxmanifest.lua
-/deploy.mjs
+.env
+
