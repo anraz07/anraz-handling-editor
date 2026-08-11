@@ -6,6 +6,7 @@
     "lib": ["ESNext"],
      "types": [
       "@citizenfx/server",
+      "@citizenfx/client",
       "@types/node"
     ],
     /* Strict Type-Checking Options */
