@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 
-author 'Puctius'
+author 'Anraz'
 description 'Vehicle Handling Editor for QBCore (TypeScript Edition)'
 version '1.0.0'
 
