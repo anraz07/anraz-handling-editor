@@ -192,7 +192,7 @@ registerCallback<{ model: string, handling: VehicleHandlingData }>('triggerClipb
     if (val === undefined || val === null) continue;
 
     if (attr.startsWith('vec')) {
-      const [baseName, axisStr] = attr.split('_');
+      const [baseName , axisStr] = attr.split('_') as [string, string]
       if (!vectors[baseName]) vectors[baseName] = {x:0, y:0, z:0};
       vectors[baseName][axisStr as 'x'|'y'|'z'] = val;
     } else {

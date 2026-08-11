@@ -1,4 +1,4 @@
-# 🏎️ Anraz Handling Editor
+# Anraz Handling Editor
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![Framework](https://img.shields.io/badge/framework-QBCore-red.svg)
@@ -6,23 +6,23 @@
 
 Un script profesional y moderno para modificar el *handling* (manejo) de los vehículos en tiempo real en servidores de FiveM utilizando QBCore. Desarrollado íntegramente en **TypeScript** y con una interfaz gráfica ultra fluida creada con **React, Vite y TailwindCSS**.
 
-## ✨ Características Principales
+##  Características Principales
 
-- **🎨 Diseño Nativo GTA V:** Interfaz moderna y minimalista inspirada en los menús nativos del juego (Los Santos Customs / Interaction Menu).
-- **⚡ Edición en Vivo:** Modifica la aceleración, frenada, suspensión y tracción del vehículo y siente los cambios en tiempo real sin necesidad de reiniciar el script ni el servidor.
-- **💾 Persistencia de Datos:** Todos los cambios se guardan permanentemente en la base de datos y se aplican automáticamente cada vez que el jugador saca el vehículo del garaje.
-- **🔄 Sistema de Reset:** Botón integrado para restaurar el handling original (*stock*) del vehículo con un solo clic.
-- **📋 Exportación e Importación:** Copia la configuración actual en formato XML (`handling.meta`) al portapapeles, o importa configuraciones externas pegando fragmentos de código XML.
-- **🚀 Rendimiento Óptimo:** Escrito 100% en TypeScript y transpilado con `esbuild`, minimizando el impacto en el servidor (0.00ms de resmon).
+- ** Diseño:** La intención era crear una interfaz más parecida a la del juego base.
+- ** Modificación de Handling en Caliente:** Se puede modificar el handling en su totalidad en caliente. Esto solo se debe usar en servidores de prueba para ajustar el handling y posteriormente descargar el xml y modificar el handling nativo del coche.
+- ** Persistencia de Datos:** Todos los cambios se guardan permanentemente en la base de datos y se aplican automáticamente cada vez que el jugador saca el vehículo del garaje.
+- ** Sistema de Reset:** Botón integrado para restaurar el handling original (*stock*) del vehículo con un solo clic.
+- ** Exportación e Importación:** Copia la configuración actual en formato XML (`handling.meta`) al portapapeles, o importa configuraciones externas pegando fragmentos de código XML.
+- ** Rendimiento Óptimo:** Escrito 100% en TypeScript y transpilado con `esbuild`, minimizando el impacto en el servidor. (Teoricamente debería ir mejor y consumir menos que el mismo script en LUA, pero no he llegado a testear ambas versiones para comprobarlo)
 
-## 🛠️ Requisitos Previos
+##  Requisitos Previos
 
 Asegúrate de tener instalados y configurados los siguientes recursos en tu servidor:
 
 - **[QBCore Framework](https://github.com/qbcore-framework/qb-core):** Framework base para la comprobación de permisos y trabajos.
 - **[oxmysql](https://github.com/overextended/oxmysql):** Base de datos optimizada para interactuar con la persistencia del handling.
 
-## 📥 Instalación
+##  Instalación
 
 ### Método 1: Instalación Rápida (Recomendado)
 1. Descarga la última versión compilada (Release) del script.
@@ -56,7 +56,7 @@ Si deseas modificar el código o compilarlo tú mismo:
    ```
 5. La carpeta estará lista para usarse en tu servidor de FiveM.
 
-## ⚙️ Configuración
+##  Configuración
 
 El archivo de configuración principal se encuentra en `src/shared/config.ts`.
 *(Nota: Si cambias la configuración en el código fuente, deberás volver a compilar usando `npm run deploy`)*.
@@ -64,7 +64,7 @@ El archivo de configuración principal se encuentra en `src/shared/config.ts`.
 ```typescript
 export const Config = {
   // Trabajos permitidos para usar el comando
-  allowedJobs: ['tuner', 'mechanic'], 
+  allowedJobs: ['mechanic', 'police', 'ems'], 
 
   // Comando para abrir la interfaz
   commandName: 'tunehandling',
@@ -79,9 +79,9 @@ export const Config = {
 };
 ```
 
-## 💻 Uso
+##  Uso
 
-1. Entra a tu servidor con un personaje que tenga el trabajo asignado (ej. `tuner`).
+1. Entra a tu servidor con un personaje que tenga el trabajo asignado.
 2. Sube a un vehículo (en el asiento del conductor).
 3. Abre el chat (T) y escribe el comando:
    `/tunehandling`
@@ -90,8 +90,7 @@ export const Config = {
 
 ## ⚠️ Notas Adicionales
 
-- **Advertencia:** Modificar los multiplicadores de inercia o el centro de masa (`vecCentreOfMassOffset`) a valores extremos puede causar bugs físicos en el motor Havok de GTA V (coches voladores o bloqueos). Usa el sentido común en la afinación.
-- Este proyecto ha sido migrado de Vanilla JS a React para un mantenimiento más sencillo y escalable. ¡Siéntete libre de contribuir!
+- **Advertencia:** Modificar los ajustes a niveles extremos puede dar problemas *obviamente*. Algunos ajustes pueden tener rangos invalidos, si se da el caso los rangos se pueden ajustar en /web/src/config/attributesMeta/ts
 
 ---
-**Desarrollado con ❤️ por Anraz.**
+**Desarrollado por Anraz.**

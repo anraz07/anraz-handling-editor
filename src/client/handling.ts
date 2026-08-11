@@ -13,7 +13,7 @@ export function getVehicleHandlingAttribute(vehicle: number, attribute: Handling
   // Comprobamos si es un attr vector
   if (attribute.startsWith('vec')) {
     try {
-      const baseName = attribute.split('_')[0];
+      const baseName = attribute.split('_')[0] as string
       const axis = attribute.split('_')[1] as 'x' | 'y' | 'z';
       const vec = GetVehicleHandlingVector(vehicle, 'CHandlingData', baseName);
       return vec[axisMap[axis]] ?? 0;
@@ -45,7 +45,7 @@ export function setVehicleHandlingAttribute(vehicle: number, attribute: Handling
   
   try {
     if (attribute.startsWith('vec')) {
-      const baseName = attribute.split('_')[0];
+      const baseName = attribute.split('_')[0] as string
       const axis = attribute.split('_')[1] as 'x' | 'y' | 'z';
       const currentVec = GetVehicleHandlingVector(vehicle, 'CHandlingData', baseName);
       
