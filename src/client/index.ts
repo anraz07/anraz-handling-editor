@@ -15,7 +15,7 @@ let currentModel = '';
 let isAllowed = true;
 
 /**
- * Refresca las físicas del vehículo en vivo y asegura el control de red.
+ * Actualiza las físicas del vehículo en vivo y asegura el control de red.
  */
 function refreshVehiclePhysics(vehicle: number): void {
   if (!DoesEntityExist(vehicle)) return;
@@ -125,7 +125,7 @@ onNet('vehiclehandling:client:openEditor', () => {
     currentActive[attr] = getVehicleHandlingAttribute(currentVehicle, attr);
   }
   const stockValues = StockHandling[currentModel] || currentActive;
-  // Dar foco al ratón y teclado para la interfaz web
+  // Enfoca al ratón y al teclado para la interfaz web
   SetNuiFocus(true, true);
   
   // Enviar mensaje al frontend (Chromium)
@@ -146,9 +146,9 @@ onNet('vehiclehandling:applyAttribute', (netId: number, attribute: HandlingAttri
     }
   }
 });
-// ==========================================
+
 // CALLBACKS NUI (Frontend -> Client)
-// ==========================================
+ 
 /**
  * Wrapper tipado para registrar NUI Callbacks de forma limpia.
  */
