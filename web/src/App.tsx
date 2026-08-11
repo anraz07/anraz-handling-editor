@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNuiEvent } from './hooks/useNuiEvent';
 import { fetchNui } from './utils/fetchNui';
 import { attributesMeta } from './config/attributesMeta';
 import { TuningSlider } from './components/TuningSlider';
 import { X, Save, RotateCcw, Copy, Upload } from 'lucide-react';
+import Draggable from 'react-draggable'
 
 export const App: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -18,6 +19,8 @@ export const App: React.FC = () => {
   const [importError, setImportError] = useState('');
 
   const tabs = ['engine', 'brakes', 'traction', 'suspension', 'damage'];
+
+  const nodeRef = useRef<HTMLDivElement>(null)
 
   // Handle opening the UI
   useNuiEvent('open', (data: any) => {
@@ -139,16 +142,22 @@ export const App: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="flex items-center justify-end h-screen w-screen bg-transparent pr-12 font-sans select-none">
-      <div className="w-[450px] max-h-[90vh] bg-gta-bg border-t-[12px] border-white flex flex-col shadow-2xl relative overflow-hidden">
+    <div onContextMenu={(e) => e.preventDefault()} 
+  onMouseDown={(e) => {
+    if (e.button === 2) {
+      fetchNui('enableCameraMode');
+    }
+  }} className="flex items-center justify-end h-screen w-screen bg-transparent pr-12 font-sans select-none">
+      <Draggable handle=".drag-handle" nodeRef={nodeRef}>
+      <div ref={nodeRef} className="w-[450px] max-h-[90vh] bg-gta-bg border-t-[12px] border-white flex flex-col shadow-2xl relative overflow-hidden">
         
         {/* Header GTA V Style */}
-        <div className="bg-gta-header px-4 py-3 flex justify-between items-center text-white border-b border-white/10">
+        <div className="drag-handle cursor-move bg-gta-header px-4 py-3 flex justify-between items-center text-white border-b border-white/10">
           <div>
             <h1 className="text-xl font-bold uppercase tracking-widest leading-none">Handling Editor</h1>
             <span className="text-[11px] text-gta-accent font-bold tracking-widest uppercase">{vehicleLabel} ({currentModel})</span>
           </div>
-          <button onClick={closeUI} className="hover:text-red-500 transition-colors">
+          <button onPointerDown={(e) => e.stopPropagation()} onClick={closeUI} className="hover:text-red-500 transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -220,6 +229,7 @@ export const App: React.FC = () => {
         )}
 
       </div>
+      </Draggable>
     </div>
   );
 };
