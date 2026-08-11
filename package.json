@@ -1,0 +1,28 @@
+{
+  "name": "puctinov-handling-editor-for-qb",
+  "version": "1.0.0",
+  "description": "**Version:** 1.0.0 **Framework:** QBCORE **Category:** Vehicle **Created:** 11/06/2026",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Puctius/puctinov-handling-editor-for-qb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Puctius/puctinov-handling-editor-for-qb/issues"
+  },
+  "homepage": "https://github.com/Puctius/puctinov-handling-editor-for-qb#readme",
+  "devDependencies": {
+    "@citizenfx/client": "^2.0.34410-1",
+    "@citizenfx/server": "^2.0.34629-1",
+    "@types/node": "^26.2.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}
