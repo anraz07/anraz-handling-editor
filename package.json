@@ -23,6 +23,7 @@
   "devDependencies": {
     "@citizenfx/client": "^2.0.34410-1",
     "@citizenfx/server": "^2.0.34629-1",
+    "@overextended/oxmysql": "^2.14.1",
     "@types/node": "^26.2.0",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2"
