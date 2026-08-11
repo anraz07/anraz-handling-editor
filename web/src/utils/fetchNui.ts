@@ -4,22 +4,27 @@
  * @param data - The data payload
  * @returns A promise of the parsed JSON response
  */
-export async function fetchNui<T = any>(eventName: string, data?: any): Promise<T> {
+export async function fetchNui<T = any>(
+  eventName: string,
+  data?: any,
+): Promise<T> {
   const options = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json; charset=UTF-8',
+      "Content-Type": "application/json; charset=UTF-8",
     },
     body: JSON.stringify(data || {}),
-  };
+  }
 
-  const resourceName = (window as any).GetParentResourceName ? (window as any).GetParentResourceName() : 'anraz-handling-editor';
+  const resourceName = (window as any).GetParentResourceName
+    ? (window as any).GetParentResourceName()
+    : "anraz-handling-editor"
 
   try {
-    const resp = await fetch(`https://${resourceName}/${eventName}`, options);
-    return await resp.json();
+    const resp = await fetch(`https://${resourceName}/${eventName}`, options)
+    return await resp.json()
   } catch (err) {
-    console.error(`[fetchNui] Error sending message to ${eventName}:`, err);
-    throw err;
+    console.error(`[fetchNui] Error sending message to ${eventName}:`, err)
+    throw err
   }
 }

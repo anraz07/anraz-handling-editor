@@ -1,237 +1,327 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNuiEvent } from './hooks/useNuiEvent';
-import { fetchNui } from './utils/fetchNui';
-import { attributesMeta } from './config/attributesMeta';
-import { TuningSlider } from './components/TuningSlider';
-import { X, Save, RotateCcw, Copy, Upload } from 'lucide-react';
-import Draggable from 'react-draggable'
+import React, { useState, useEffect, useRef, useCallback } from "react"
+import { useNuiEvent } from "./hooks/useNuiEvent"
+import { fetchNui } from "./utils/fetchNui"
+import { attributesMeta } from "./config/attributesMeta"
+import { TuningSlider } from "./components/TuningSlider"
+import { X, Save, RotateCcw, Copy, Upload } from "lucide-react"
+import Draggable from "react-draggable"
 
 export const App: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [currentHandling, setCurrentHandling] = useState<Record<string, number>>({});
-  const [stockHandling, setStockHandling] = useState<Record<string, number>>({});
-  const [currentModel, setCurrentModel] = useState('');
-  const [vehicleLabel, setVehicleLabel] = useState('');
-  const [activeTab, setActiveTab] = useState('engine');
-  
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [importXml, setImportXml] = useState('');
-  const [importError, setImportError] = useState('');
+  const [isVisible, setIsVisible] = useState(false)
+  const [currentHandling, setCurrentHandling] = useState<
+    Record<string, number>
+  >({})
+  const [stockHandling, setStockHandling] = useState<Record<string, number>>({})
+  const [currentModel, setCurrentModel] = useState("")
+  const [vehicleLabel, setVehicleLabel] = useState("")
+  const [activeTab, setActiveTab] = useState("engine")
 
-  const tabs = ['engine', 'brakes', 'traction', 'suspension', 'damage'];
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+  const [importXml, setImportXml] = useState("")
+  const [importError, setImportError] = useState("")
+
+  const tabs = ["engine", "brakes", "traction", "suspension", "damage"]
 
   const nodeRef = useRef<HTMLDivElement>(null)
 
   // Handle opening the UI
-  useNuiEvent('open', (data: any) => {
-    setCurrentModel(data.model);
-    setVehicleLabel(data.label);
-    setCurrentHandling(data.handling);
-    setStockHandling(data.stock);
-    setIsVisible(true);
-  });
+  useNuiEvent("open", (data: any) => {
+    setCurrentModel(data.model)
+    setVehicleLabel(data.label)
+    setCurrentHandling(data.handling)
+    setStockHandling(data.stock)
+    setIsVisible(true)
+  })
+
+  useNuiEvent<{ text: string }>("copy", (data) => {
+    if (!data?.text) return
+
+    const copyToClipboard = async (text: string): Promise<boolean> => {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text)
+          return true
+        }
+      } catch (_) {}
+
+      try {
+        const textarea = document.createElement("textarea")
+        textarea.value = text
+        textarea.style.position = "fixed"
+        textarea.style.left = "-9999px"
+        textarea.style.top = "-9999px"
+        document.body.appendChild(textarea)
+        textarea.focus()
+        textarea.select()
+        const successful = document.execCommand("copy")
+        document.body.removeChild(textarea)
+        return successful
+      } catch (_) {
+        return false
+      }
+    }
+
+    copyToClipboard(data.text).then((success) => {
+      fetchNui("copied", { success })
+    })
+  })
 
   // Handle closing with Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isVisible) {
+      if (e.key === "Escape" && isVisible) {
         if (isImportModalOpen) {
-          setIsImportModalOpen(false);
+          setIsImportModalOpen(false)
         } else {
-          closeUI();
+          closeUI()
         }
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isVisible, isImportModalOpen]);
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isVisible, isImportModalOpen])
 
   const closeUI = () => {
-    setIsVisible(false);
-    fetchNui('closeUI');
-  };
+    setIsVisible(false)
+    fetchNui("closeUI")
+  }
 
-  const handleValueChange = (attr: string, value: number) => {
-    setCurrentHandling(prev => ({ ...prev, [attr]: value }));
-    // Instantly apply in game
-    fetchNui('applyValue', { attribute: attr, value });
-  };
+  // 1. useRef throttles the FiveM NUI IPC network calls (Problem 1)
+  const lastCallRef = useRef(0)
+
+  // 2. useCallback memoizes the function reference so React.memo works (Problem 2)
+  const handleValueChange = useCallback((attr: string, value: number) => {
+    // Update state locally
+    setCurrentHandling((prev) => ({ ...prev, [attr]: value }))
+
+    // Throttle NUI fetch calls (max once per 50ms)
+    const now = Date.now()
+    if (now - lastCallRef.current > 50) {
+      lastCallRef.current = now
+      fetchNui("applyValue", { attribute: attr, value })
+    }
+  }, [])
 
   const handleSave = () => {
-    fetchNui('saveTuning', { model: currentModel, handling: currentHandling });
-  };
+    fetchNui("saveTuning", { model: currentModel, handling: currentHandling })
+  }
 
   const handleReset = () => {
-    const stock = JSON.parse(JSON.stringify(stockHandling));
-    setCurrentHandling(stock);
-    
-    // Send all stock values back to client
-    for (const [attr, val] of Object.entries(stock)) {
-      fetchNui('applyValue', { attribute: attr, value: val });
-    }
-    
-    fetchNui('resetStock', { model: currentModel });
-  };
+    const stock = { ...stockHandling }
+    setCurrentHandling(stock)
+
+    fetchNui("resetStock", { model: currentModel })
+  }
 
   const handleCopy = () => {
-    fetchNui('triggerClipboardCopy', { model: currentModel, handling: currentHandling });
-  };
+    fetchNui("triggerClipboardCopy", {
+      model: currentModel,
+      handling: currentHandling,
+    })
+  }
 
   const handleImportSubmit = () => {
-    if (!importXml.trim()) return;
-    setImportError('');
-    
+    if (!importXml.trim()) return
+    setImportError("")
+
     try {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(`<HandlingData>${importXml}</HandlingData>`, 'text/xml');
-      
-      const parseError = xmlDoc.querySelector('parsererror');
+      const parser = new DOMParser()
+      const xmlDoc = parser.parseFromString(
+        `<HandlingData>${importXml}</HandlingData>`,
+        "text/xml",
+      )
+
+      const parseError = xmlDoc.querySelector("parsererror")
       if (parseError) {
-        setImportError('Invalid XML Format');
-        return;
+        setImportError("Invalid XML Format")
+        return
       }
 
-      let count = 0;
-      const newHandling = { ...currentHandling };
+      let count = 0
+      const newHandling = { ...currentHandling }
 
       for (const [attrName, meta] of Object.entries(attributesMeta)) {
-        let parsedValue: number | null = null;
-        
-        const vectorMatch = attrName.match(/^(vec\w+)_(x|y|z)$/);
+        let parsedValue: number | null = null
+
+        const vectorMatch = attrName.match(/^(vec\w+)_(x|y|z)$/)
         if (vectorMatch) {
-          const baseName = vectorMatch[1];
-          const component = vectorMatch[2];
-          const vecEl = xmlDoc.querySelector(baseName);
+          const baseName = vectorMatch[1]
+          const component = vectorMatch[2]
+          const vecEl = xmlDoc.querySelector(baseName)
           if (vecEl) {
-            const compVal = vecEl.getAttribute(component);
-            if (compVal !== null) parsedValue = parseFloat(compVal);
+            const compVal = vecEl.getAttribute(component)
+            if (compVal !== null) parsedValue = parseFloat(compVal)
           }
         } else {
-          const el = xmlDoc.querySelector(attrName);
+          const el = xmlDoc.querySelector(attrName)
           if (el) {
-            const valAttr = el.getAttribute('value');
-            const valToParse = valAttr !== null ? valAttr : el.textContent?.trim();
+            const valAttr = el.getAttribute("value")
+            const valToParse =
+              valAttr !== null ? valAttr : el.textContent?.trim()
             if (valToParse) {
-              parsedValue = meta.type === 'hex' 
-                ? parseInt(valToParse.replace(/^0x/i, ''), 16) 
-                : parseFloat(valToParse);
+              parsedValue =
+                meta.type === "hex"
+                  ? parseInt(valToParse.replace(/^0x/i, ""), 16)
+                  : parseFloat(valToParse)
             }
           }
         }
 
         if (parsedValue !== null && !isNaN(parsedValue)) {
-          newHandling[attrName] = parsedValue;
-          fetchNui('applyValue', { attribute: attrName, value: parsedValue });
-          count++;
+          newHandling[attrName] = parsedValue
+          fetchNui("applyValue", { attribute: attrName, value: parsedValue })
+          count++
         }
       }
 
       if (count > 0) {
-        setCurrentHandling(newHandling);
-        setIsImportModalOpen(false);
-        setImportXml('');
-        fetchNui('xmlImported', { count });
+        setCurrentHandling(newHandling)
+        setIsImportModalOpen(false)
+        setImportXml("")
+        fetchNui("xmlImported", { count })
       } else {
-        setImportError('No matching attributes found in XML.');
+        setImportError("No matching attributes found in XML.")
       }
     } catch (e) {
-      setImportError('Error parsing XML.');
+      setImportError("Error parsing XML.")
     }
-  };
+  }
 
-  if (!isVisible) return null;
+  if (!isVisible) return null
 
   return (
-    <div onContextMenu={(e) => e.preventDefault()} 
-  onMouseDown={(e) => {
-    if (e.button === 2) {
-      fetchNui('enableCameraMode');
-    }
-  }} className="flex items-center justify-end h-screen w-screen bg-transparent pr-12 font-sans select-none">
+    <div
+      onContextMenu={(e) => e.preventDefault()}
+      onMouseDown={(e) => {
+        if (e.button === 2) {
+          fetchNui("enableCameraMode")
+        }
+      }}
+      className="flex items-center justify-end h-screen w-screen bg-transparent pr-12 font-sans select-none"
+    >
       <Draggable handle=".drag-handle" nodeRef={nodeRef}>
-      <div ref={nodeRef} className="w-[450px] max-h-[90vh] bg-gta-bg border-t-[12px] border-white flex flex-col shadow-2xl relative overflow-hidden">
-        
-        {/* Header GTA V Style */}
-        <div className="drag-handle cursor-move bg-gta-header px-4 py-3 flex justify-between items-center text-white border-b border-white/10">
-          <div>
-            <h1 className="text-xl font-bold uppercase tracking-widest leading-none">Handling Editor</h1>
-            <span className="text-[11px] text-gta-accent font-bold tracking-widest uppercase">{vehicleLabel} ({currentModel})</span>
-          </div>
-          <button onPointerDown={(e) => e.stopPropagation()} onClick={closeUI} className="hover:text-red-500 transition-colors">
-            <X size={24} />
-          </button>
-        </div>
-
-        {/* Tab Navigation */}
-        <div className="flex bg-black/60 border-b border-white/10">
-          {tabs.map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider border-b-2 transition-colors ${
-                activeTab === tab ? 'border-white text-white bg-white/10' : 'border-transparent text-white/50 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-          {Object.entries(attributesMeta).map(([attrName, meta]) => {
-            if (meta.tab !== activeTab) return null;
-            return (
-              <TuningSlider
-                key={attrName}
-                attrName={attrName}
-                meta={meta}
-                value={currentHandling[attrName] || 0}
-                onChange={handleValueChange}
-              />
-            );
-          })}
-        </div>
-
-        {/* Footer Actions */}
-        <div className="bg-gta-header p-2 flex flex-wrap gap-1 border-t border-white/10 text-white">
-          <button onClick={handleSave} className="flex-1 min-w-[45%] bg-white/10 hover:bg-white hover:text-black py-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors">
-            <Save size={14} /> Save
-          </button>
-          <button onClick={handleReset} className="flex-1 min-w-[45%] bg-white/10 hover:bg-white hover:text-black py-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors">
-            <RotateCcw size={14} /> Reset
-          </button>
-          <button onClick={handleCopy} className="flex-1 min-w-[45%] bg-white/10 hover:bg-white hover:text-black py-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors">
-            <Copy size={14} /> Copy XML
-          </button>
-          <button onClick={() => setIsImportModalOpen(true)} className="flex-1 min-w-[45%] bg-white/10 hover:bg-white hover:text-black py-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors">
-            <Upload size={14} /> Import
-          </button>
-        </div>
-
-        {/* Import Modal */}
-        {isImportModalOpen && (
-          <div className="absolute inset-0 bg-black/80 flex flex-col p-4 z-50">
-            <h2 className="text-white font-bold uppercase tracking-wider mb-2">Import Handling XML</h2>
-            <p className="text-white/70 text-xs mb-2">Paste handling.meta snippet below.</p>
-            <textarea 
-              className="flex-1 w-full bg-white/10 text-white p-2 font-mono text-xs border border-white/20 outline-none focus:border-gta-accent resize-none mb-2"
-              value={importXml}
-              onChange={(e) => setImportXml(e.target.value)}
-              placeholder="<Item type=&quot;CHandlingData&quot;>..."
-            />
-            {importError && <div className="text-red-500 text-xs mb-2">{importError}</div>}
-            <div className="flex gap-2">
-              <button onClick={() => setIsImportModalOpen(false)} className="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 text-xs font-bold uppercase">Cancel</button>
-              <button onClick={handleImportSubmit} className="flex-1 bg-white hover:bg-gray-200 text-black py-2 text-xs font-bold uppercase">Import</button>
+        <div
+          ref={nodeRef}
+          className="w-[450px] max-h-[90vh] bg-gta-bg border-t-[12px] border-white flex flex-col shadow-2xl relative overflow-hidden"
+        >
+          {/* Header GTA V Style */}
+          <div className="drag-handle cursor-move bg-gta-header px-4 py-3 flex justify-between items-center text-white border-b border-white/10">
+            <div>
+              <h1 className="text-xl font-bold uppercase tracking-widest leading-none">
+                Handling Editor
+              </h1>
+              <span className="text-[11px] text-gta-accent font-bold tracking-widest uppercase">
+                {vehicleLabel} ({currentModel})
+              </span>
             </div>
+            <button
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={closeUI}
+              className="hover:text-red-500 transition-colors"
+            >
+              <X size={24} />
+            </button>
           </div>
-        )}
 
-      </div>
+          {/* Tab Navigation */}
+          <div className="flex bg-black/60 border-b border-white/10">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider border-b-2 transition-colors ${
+                  activeTab === tab
+                    ? "border-white text-white bg-white/10"
+                    : "border-transparent text-white/50 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Content Area */}
+          <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            {Object.entries(attributesMeta).map(([attrName, meta]) => {
+              if (meta.tab !== activeTab) return null
+              return (
+                <TuningSlider
+                  key={attrName}
+                  attrName={attrName}
+                  meta={meta}
+                  value={currentHandling[attrName] || 0}
+                  onChange={handleValueChange}
+                />
+              )
+            })}
+          </div>
+
+          {/* Footer Actions */}
+          <div className="bg-gta-header p-2 flex flex-wrap gap-1 border-t border-white/10 text-white">
+            <button
+              onClick={handleSave}
+              className="flex-1 min-w-[45%] bg-white/10 hover:bg-white hover:text-black py-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors"
+            >
+              <Save size={14} /> Save
+            </button>
+            <button
+              onClick={handleReset}
+              className="flex-1 min-w-[45%] bg-white/10 hover:bg-white hover:text-black py-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors"
+            >
+              <RotateCcw size={14} /> Reset
+            </button>
+            <button
+              onClick={handleCopy}
+              className="flex-1 min-w-[45%] bg-white/10 hover:bg-white hover:text-black py-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors"
+            >
+              <Copy size={14} /> Copy XML
+            </button>
+            <button
+              onClick={() => setIsImportModalOpen(true)}
+              className="flex-1 min-w-[45%] bg-white/10 hover:bg-white hover:text-black py-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors"
+            >
+              <Upload size={14} /> Import
+            </button>
+          </div>
+
+          {/* Import Modal */}
+          {isImportModalOpen && (
+            <div className="absolute inset-0 bg-black/80 flex flex-col p-4 z-50">
+              <h2 className="text-white font-bold uppercase tracking-wider mb-2">
+                Import Handling XML
+              </h2>
+              <p className="text-white/70 text-xs mb-2">
+                Paste handling.meta snippet below.
+              </p>
+              <textarea
+                className="flex-1 w-full bg-white/10 text-white p-2 font-mono text-xs border border-white/20 outline-none focus:border-gta-accent resize-none mb-2"
+                value={importXml}
+                onChange={(e) => setImportXml(e.target.value)}
+                placeholder='<Item type="CHandlingData">...'
+              />
+              {importError && (
+                <div className="text-red-500 text-xs mb-2">{importError}</div>
+              )}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setIsImportModalOpen(false)}
+                  className="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 text-xs font-bold uppercase"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleImportSubmit}
+                  className="flex-1 bg-white hover:bg-gray-200 text-black py-2 text-xs font-bold uppercase"
+                >
+                  Import
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </Draggable>
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App

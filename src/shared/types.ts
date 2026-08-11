@@ -1,75 +1,74 @@
-export type HandlingAttribute = 
-    'fMass'
-    |'fInitialDragCoeff'
-    |'fDownforceModifier'
-    |'fPercentSubmerged'
-    |'vecCentreOfMassOffset_x'
-    |'vecCentreOfMassOffset_y'
-    |'vecCentreOfMassOffset_z'
-    |'vecInertiaMultiplier_x'
-    |'vecInertiaMultiplier_y'
-    |'vecInertiaMultiplier_z'
-    |'fDriveBiasFront'
-    |'nInitialDriveGears'
-    |'fInitialDriveForce'
-    |'fDriveInertia'
-    |'fClutchChangeRateScaleUpShift'
-    |'fClutchChangeRateScaleDownShift'
-    |'fInitialDriveMaxFlatVel'
-    |'fBrakeForce'
-    |'fBrakeBiasFront'
-    |'fHandBrakeForce'
-    |'fSteeringLock'
-    |'fTractionCurveMax'
-    |'fTractionCurveMin'
-    |'fTractionCurveLateral'
-    |'fTractionSpringDeltaMax'
-    |'fLowSpeedTractionLossMult'
-    |'fCamberStiffnesss'
-    |'fTractionBiasFront'
-    |'fTractionLossMult'
-    |'fSuspensionForce'
-    |'fSuspensionCompDamp'
-    |'fSuspensionReboundDamp'
-    |'fSuspensionUpperLimit'
-    |'fSuspensionLowerLimit'
-    |'fSuspensionRaise'
-    |'fSuspensionBiasFront'
-    |'fAntiRollBarForce'
-    |'fAntiRollBarBiasFront'
-    |'fRollCentreHeightFront'
-    |'fRollCentreHeightRear'
-    |'fCollisionDamageMult'
-    |'fWeaponDamageMult'
-    |'fDeformationDamageMult'
-    |'fEngineDamageMult'
-    |'fPetrolTankVolume'
-    |'fPetrolConsumptionRate'
-    |'fOilVolume'
-    |'fSeatOffsetDistX'
-    |'fSeatOffsetDistY'
-    |'fSeatOffsetDistZ'
-    |'nMonetaryValue'
-    |'strModelFlags'
-    |'strHandlingFlags'
-    |'strDamageFlags'
-    
-    |'fBackEndPopUpCarImpulseMult'
-    |'fBackEndPopUpBuildingImpulseMult'
-    |'fBackEndPopUpMaxDeltaSpeed'
-    |'fToeFront'
-    |'fToeRear'
-    |'fCamberFront'
-    |'fCamberRear'
-    |'fCastor'
-    |'fMaxDriveBiasTransfer'
-    |'fJumpForceScale'
-    |'fIncreasedRammingForceScale'
-    |'strAdvancedFlags'
+export type HandlingAttribute =
+  | "fMass"
+  | "fInitialDragCoeff"
+  | "fDownforceModifier"
+  | "fPercentSubmerged"
+  | "vecCentreOfMassOffset_x"
+  | "vecCentreOfMassOffset_y"
+  | "vecCentreOfMassOffset_z"
+  | "vecInertiaMultiplier_x"
+  | "vecInertiaMultiplier_y"
+  | "vecInertiaMultiplier_z"
+  | "fDriveBiasFront"
+  | "nInitialDriveGears"
+  | "fInitialDriveForce"
+  | "fDriveInertia"
+  | "fClutchChangeRateScaleUpShift"
+  | "fClutchChangeRateScaleDownShift"
+  | "fInitialDriveMaxFlatVel"
+  | "fBrakeForce"
+  | "fBrakeBiasFront"
+  | "fHandBrakeForce"
+  | "fSteeringLock"
+  | "fTractionCurveMax"
+  | "fTractionCurveMin"
+  | "fTractionCurveLateral"
+  | "fTractionSpringDeltaMax"
+  | "fLowSpeedTractionLossMult"
+  | "fCamberStiffnesss"
+  | "fTractionBiasFront"
+  | "fTractionLossMult"
+  | "fSuspensionForce"
+  | "fSuspensionCompDamp"
+  | "fSuspensionReboundDamp"
+  | "fSuspensionUpperLimit"
+  | "fSuspensionLowerLimit"
+  | "fSuspensionRaise"
+  | "fSuspensionBiasFront"
+  | "fAntiRollBarForce"
+  | "fAntiRollBarBiasFront"
+  | "fRollCentreHeightFront"
+  | "fRollCentreHeightRear"
+  | "fCollisionDamageMult"
+  | "fWeaponDamageMult"
+  | "fDeformationDamageMult"
+  | "fEngineDamageMult"
+  | "fPetrolTankVolume"
+  | "fPetrolConsumptionRate"
+  | "fOilVolume"
+  | "fSeatOffsetDistX"
+  | "fSeatOffsetDistY"
+  | "fSeatOffsetDistZ"
+  | "nMonetaryValue"
+  | "strModelFlags"
+  | "strHandlingFlags"
+  | "strDamageFlags"
+  | "fBackEndPopUpCarImpulseMult"
+  | "fBackEndPopUpBuildingImpulseMult"
+  | "fBackEndPopUpMaxDeltaSpeed"
+  | "fToeFront"
+  | "fToeRear"
+  | "fCamberFront"
+  | "fCamberRear"
+  | "fCastor"
+  | "fMaxDriveBiasTransfer"
+  | "fJumpForceScale"
+  | "fIncreasedRammingForceScale"
+  | "strAdvancedFlags"
 
-    export type VehicleHandlingData = Partial<Record<HandlingAttribute, number>>
+export type VehicleHandlingData = Partial<Record<HandlingAttribute, number>>
 
-    export interface EditorConfig {
-        allowedJobs: string[]
-        validAttributes: HandlingAttribute[]
-    }
+export interface EditorConfig {
+  allowedJobs: string[]
+  validAttributes: HandlingAttribute[]
+}
