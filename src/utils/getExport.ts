@@ -8,7 +8,6 @@ export function getExport<T = any>(resource: string): T {
 }
 
 export interface QBCoreExport {
-  getCoreObject: () => any;
   GetCoreObject: () => any;
 }
 

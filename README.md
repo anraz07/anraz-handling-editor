@@ -1,4 +1,4 @@
-# qb-vehicle-handling-editor
+# anraz-handling-editor
 
 **Version:** 1.0.0
 **Framework:** QBCORE

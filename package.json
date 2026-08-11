@@ -1,25 +1,26 @@
 {
-  "name": "puctinov-handling-editor-for-qb",
+  "name": "anraz-handling-editor",
   "version": "1.0.0",
   "description": "**Version:** 1.0.0 **Framework:** QBCORE **Category:** Vehicle **Created:** 11/06/2026",
   "main": "index.js",
   "scripts": {
     "build:client": "esbuild src/client/index.ts --bundle --outfile=dist/client.js --target=es2021 --platform=browser",
     "build:server": "esbuild src/server/index.ts --bundle --outfile=dist/server.js --target=es2021 --platform=node",
-    "build": "npm run build:client && npm run build:server"
+    "build": "npm run build:client && npm run build:server",
+    "deploy": "npm run build && node deploy.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Puctius/puctinov-handling-editor-for-qb.git"
+    "url": "git+https://github.com/anraz07/anraz-handling-editort"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/Puctius/puctinov-handling-editor-for-qb/issues"
+    "url": "https://github.com/anraz07/anraz-handling-editor/issues"
   },
-  "homepage": "https://github.com/Puctius/puctinov-handling-editor-for-qb#readme",
+  "homepage": "https://github.com/anraz07/anraz-handling-editor#readme",
   "devDependencies": {
     "@citizenfx/client": "^2.0.34410-1",
     "@citizenfx/server": "^2.0.34629-1",

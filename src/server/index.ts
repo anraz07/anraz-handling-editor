@@ -2,7 +2,7 @@ import { Config } from "../shared/config";
 import { HandlingAttribute, VehicleHandlingData } from '../shared/types'
 import { getExport, QBCoreExport } from "../utils/getExport";
 
-const QBCore = getExport<QBCoreExport>('qb-core').getCoreObject()
+const QBCore = getExport<QBCoreExport>('qb-core').GetCoreObject()
 
 async function migrateDatabaseTable(): Promise<void> {
     try{
@@ -152,14 +152,10 @@ onNet('vehiclehandling:saveModelTuning', async (modelName: string, data: Vehicle
     ON DUPLICATE KEY UPDATE ${updateClauses.join(', ')}
   `;
   try {
-    const affectedRows: number = await (globalThis as any).exports.oxmysql.execute_async(query, params);
-    if (affectedRows > 0) {
-      TriggerClientEvent('QBCore:Notify', src, 'Model handling profile saved successfully!', 'success');
-      // Transmitir a todos los conductores activos para recargar el vehículo
-      TriggerClientEvent('vehiclehandling:refreshModelDrivers', -1, modelName);
-    } else {
-      TriggerClientEvent('QBCore:Notify', src, 'Failed to save handling profile.', 'error');
-    }
+    await (globalThis as any).exports.oxmysql.execute_async(query, params);
+    TriggerClientEvent('QBCore:Notify', src, 'Model handling profile saved successfully!', 'success');
+    // Transmitir a todos los conductores activos para recargar el vehículo
+    TriggerClientEvent('vehiclehandling:refreshModelDrivers', -1, modelName);
   } catch (err) {
     console.error(`[qb-vehicle-handling-editor] Error saving tuning for model ${modelName}:`, err);
     TriggerClientEvent('QBCore:Notify', src, 'Error saving handling profile.', 'error');

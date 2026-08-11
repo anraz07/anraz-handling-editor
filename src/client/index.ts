@@ -179,6 +179,51 @@ registerCallback('closeUI', (_, cb) => {
   SetNuiFocus(false, false);
   cb('ok');
 });
+registerCallback<{ model: string, handling: VehicleHandlingData }>('triggerClipboardCopy', (data, cb) => {
+  let xmlString = `<Item type="CHandlingData">\n`;
+  xmlString += `  <handlingName>${data.model.toUpperCase()}</handlingName>\n`;
+
+  // We group vector coordinates if needed, but for simplicity we output them as standard XML elements.
+  // Standard handling.meta formats Vectors like: <vecCentreOfMassOffset x="0.0" y="0.0" z="0.0" />
+  const vectors: Record<string, {x:number, y:number, z:number}> = {};
+
+  for (const attr of Config.validAttributes) {
+    const val = data.handling[attr];
+    if (val === undefined || val === null) continue;
+
+    if (attr.startsWith('vec')) {
+      const [baseName, axisStr] = attr.split('_');
+      if (!vectors[baseName]) vectors[baseName] = {x:0, y:0, z:0};
+      vectors[baseName][axisStr as 'x'|'y'|'z'] = val;
+    } else {
+      if (attr.startsWith('str')) {
+        // Formatear Flags a Hexadecimal (0x000000)
+        let hex = '0x' + (val >>> 0).toString(16).toUpperCase().padStart(8, '0');
+        xmlString += `  <${attr} value="${hex}" />\n`;
+      } else {
+        // Formatear Floats/Ints a 6 decimales para mantener consistencia con GTA
+        let formatted = Number(val).toFixed(6);
+        xmlString += `  <${attr} value="${formatted}" />\n`;
+      }
+    }
+  }
+
+  // Insertar los vectores generados
+  for (const [vecName, coords] of Object.entries(vectors)) {
+    xmlString += `  <${vecName} x="${coords.x.toFixed(6)}" y="${coords.y.toFixed(6)}" z="${coords.z.toFixed(6)}" />\n`;
+  }
+
+  xmlString += `</Item>`;
+
+  // Enviar de vuelta a NUI para copiar al portapapeles del SO
+  SendNUIMessage({
+    type: 'copy',
+    text: xmlString
+  });
+
+  cb('ok');
+});
+
 // Respuestas simples de la UI
 registerCallback('copied', (data: { success: boolean }, cb) => {
   if (data?.success) {
@@ -188,6 +233,7 @@ registerCallback('copied', (data: { success: boolean }, cb) => {
   }
   cb('ok');
 });
+
 registerCallback('xmlImported', (data: { count: number }, cb) => {
   if (data?.count && data.count > 0) {
     QBCore.Functions.Notify(`Successfully imported ${data.count} handling parameters!`, 'success');
