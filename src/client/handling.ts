@@ -11,10 +11,15 @@ const axisMap: Record<'x' | 'y' | 'z', number> = {
  */
 export function getVehicleHandlingAttribute(vehicle: number, attribute: HandlingAttribute): number {
   // Comprobamos si es un attr vector
-  if (attribute.startsWith('vecCentreOfMassOffset_')) {
-    const axis = attribute.split('_')[1] as 'x' | 'y' | 'z';
-    const vec = GetVehicleHandlingVector(vehicle, 'CHandlingData', 'vecCentreOfMassOffset');
-    return vec[axisMap[axis]] ?? 0;
+  if (attribute.startsWith('vec')) {
+    try {
+      const baseName = attribute.split('_')[0];
+      const axis = attribute.split('_')[1] as 'x' | 'y' | 'z';
+      const vec = GetVehicleHandlingVector(vehicle, 'CHandlingData', baseName);
+      return vec[axisMap[axis]] ?? 0;
+    } catch (e) {
+      return 0;
+    }
   }
 
   const subHandlingAttrs = [
@@ -39,15 +44,16 @@ export function getVehicleHandlingAttribute(vehicle: number, attribute: Handling
 export function setVehicleHandlingAttribute(vehicle: number, attribute: HandlingAttribute, value: number): void {
   
   try {
-    if (attribute.startsWith('vecCentreOfMassOffset_')) {
+    if (attribute.startsWith('vec')) {
+      const baseName = attribute.split('_')[0];
       const axis = attribute.split('_')[1] as 'x' | 'y' | 'z';
-      const currentVec = GetVehicleHandlingVector(vehicle, 'CHandlingData', 'vecCentreOfMassOffset');
+      const currentVec = GetVehicleHandlingVector(vehicle, 'CHandlingData', baseName);
       
       if (axis === 'x') currentVec[0] = value;
       if (axis === 'y') currentVec[1] = value;
       if (axis === 'z') currentVec[2] = value;
       //@ts-ignore
-      SetVehicleHandlingVector(vehicle, 'CHandlingData', 'vecCentreOfMassOffset', currentVec);
+      SetVehicleHandlingVector(vehicle, 'CHandlingData', baseName, currentVec);
       return;
     }
 

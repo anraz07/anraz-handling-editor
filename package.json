@@ -6,7 +6,8 @@
   "scripts": {
     "build:client": "esbuild src/client/index.ts --bundle --outfile=dist/client.js --target=es2021 --platform=browser",
     "build:server": "esbuild src/server/index.ts --bundle --outfile=dist/server.js --target=es2021 --platform=node",
-    "build": "npm run build:client && npm run build:server",
+    "build:web": "npm run build --prefix web",
+    "build": "npm run build:client && npm run build:server && npm run build:web",
     "deploy": "npm run build && node deploy.mjs"
   },
   "repository": {
