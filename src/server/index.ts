@@ -102,7 +102,7 @@ on('onResourceStart', (resourceName: string)=>{
     migrateDatabaseTable()
 })
 
-// 1. Aplicar un atributo individual a un vehículo (Broadcast a todos los clientes)
+// Aplicar un atributo individual a un vehículo (Broadcast a todos los clientes)
 onNet('vehiclehandling:setAttribute', (netId: number, attribute: HandlingAttribute, value: number) => {
   const src = global.source;
   // Validar si el atributo enviado está en la lista permitida
@@ -114,7 +114,7 @@ onNet('vehiclehandling:setAttribute', (netId: number, attribute: HandlingAttribu
   // Transmitir a todos los clientes (-1) para sincronizar la física del vehículo en red
   TriggerClientEvent('vehiclehandling:applyAttribute', -1, netId, attribute, value);
 });
-// 2. Obtener la configuración guardada en BD para un modelo
+// Obtener la configuración guardada en BD para un modelo
 onNet('vehiclehandling:fetchModelTuning', async (modelName: string) => {
   const src = global.source;
   const query = 'SELECT * FROM `vehicle_model_handling` WHERE `model` = ?';
@@ -129,7 +129,7 @@ onNet('vehiclehandling:fetchModelTuning', async (modelName: string) => {
     console.error(`[qb-vehicle-handling-editor] Error fetching tuning for model ${modelName}:`, err);
   }
 });
-// 3. Guardar o actualizar la configuración de un modelo en BD
+// Guardar o actualizar la configuración de un modelo en BD
 onNet('vehiclehandling:saveModelTuning', async (modelName: string, data: VehicleHandlingData) => {
   const src = global.source;
   const columns: string[] = ['`model`'];
@@ -165,7 +165,7 @@ onNet('vehiclehandling:saveModelTuning', async (modelName: string, data: Vehicle
     TriggerClientEvent('QBCore:Notify', src, 'Error saving handling profile.', 'error');
   }
 });
-// 4. Resetear la configuración a valores de fábrica (Elimina registro en BD)
+// Resetear la configuración a valores de fábrica
 onNet('vehiclehandling:deleteModelTuning', async (modelName: string) => {
   const src = global.source;
   const query = 'DELETE FROM `vehicle_model_handling` WHERE `model` = ?';
