@@ -34,7 +34,7 @@ Asegúrate de tener instalados y configurados los siguientes recursos en tu serv
 4. Ejecuta el archivo SQL (si se incluye) o asegúrate de que la tabla `player_vehicles` de QBCore esté funcionando.
 5. Reinicia tu servidor o inicia el script desde la consola.
 
-### Método 2: Instalación para Desarrolladores (Desde el Código Fuente)
+### Método 2: Dev
 Si deseas modificar el código o compilarlo tú mismo:
 1. Clona este repositorio:
    ```bash
